@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mi Rutina Colagen</title>
+  <title>Mi Rutina Colagen v9</title>
   <meta name="theme-color" content="#f6eee7" />
   <style>
     :root{
@@ -38,6 +38,7 @@
     @keyframes fade{from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:none}}
     .hero{border-radius:30px; padding:26px 22px; background:linear-gradient(145deg,#fffdfb,#f4e1d5); box-shadow:var(--shadow); overflow:hidden; position:relative; margin:8px 0 16px;}
     .hero:after{content:""; position:absolute; width:190px; height:190px; border-radius:50%; right:-80px; top:-70px; background:rgba(255,255,255,.48)}
+    .hero-kicker{position:relative; display:inline-flex; margin-bottom:10px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.55); color:var(--accent2); font-weight:850; font-size:12px}
     .hero h2{position:relative; margin:0 0 10px; font-size:32px; line-height:1; letter-spacing:-1px; max-width:320px}
     .hero p{position:relative; margin:0; color:var(--muted); line-height:1.45; font-size:15px; max-width:340px}
     .card{background:rgba(255,253,251,.92); border:1px solid rgba(234,216,203,.8); border-radius:var(--radius); padding:18px; box-shadow:0 10px 28px rgba(84,55,41,.08); margin:12px 0;}
@@ -74,6 +75,25 @@
     .day-badge{display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:999px; background:#f4e2d7; color:#714b3e; padding:8px 12px; font-weight:850; font-size:13px; margin-bottom:10px}
     .today-card h2{font-size:28px; margin:0 0 8px; letter-spacing:-.7px}
     .today-card p{font-size:15px}
+    .today-card .mini-note{display:inline-flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; padding:8px 12px; border-radius:999px; background:#fff7f1; border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:800}
+    .routine-overview{background:linear-gradient(145deg,#fffdfb,#fff7f1)}
+    .routine-grid{display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px}
+    .routine-tile{display:flex; gap:12px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:19px; padding:13px}
+    .routine-icon{width:38px; height:38px; min-width:38px; border-radius:15px; background:#f4e2d7; display:grid; place-items:center; font-size:20px}
+    .routine-tile strong{display:block; font-size:14px; color:#4b372f}
+    .routine-tile span{display:block; color:var(--muted); font-size:12px; line-height:1.35; margin-top:2px}
+    .smart-alert{position:relative; overflow:hidden; border:1px solid #dcc1ae; background:linear-gradient(145deg,#8d5f4f,#b9876e); color:#fff; box-shadow:0 16px 34px rgba(141,95,79,.22)}
+    .smart-alert:after{content:""; position:absolute; width:170px; height:170px; border-radius:50%; right:-70px; top:-75px; background:rgba(255,255,255,.18)}
+    .smart-alert h3,.smart-alert p{position:relative; color:#fff}
+    .smart-alert p{opacity:.92}
+    .smart-alert button{position:relative; background:#fff; color:var(--accent2); box-shadow:none}
+    .smart-alert button.secondary{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.36)}
+    .status-card{background:#fff7f1; border:1px solid var(--line); border-radius:18px; padding:13px; margin-top:10px}
+    .status-row{display:flex; align-items:flex-start; gap:10px; color:var(--muted); font-size:13px; line-height:1.35}
+    .status-dot{width:10px; height:10px; border-radius:50%; background:#c9b0a1; flex:none; margin-top:4px}
+    .status-dot.on{background:var(--success); box-shadow:0 0 0 4px rgba(110,140,116,.12)}
+    .reminder-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .photo-due-banner{background:#fff7f1; border:1px solid #dcc1ae; border-radius:18px; padding:13px; margin:12px 0; color:var(--accent2); font-size:13px; font-weight:800; line-height:1.35}
     .message{display:none; background:#f0f6ef; border:1px solid #c8dac8; color:#4d664f; border-radius:17px; padding:13px; margin-top:12px; font-weight:750; line-height:1.35}
     .message.show{display:block}
     .photo-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
@@ -131,6 +151,7 @@
 
     <section id="welcome" class="screen active">
       <div class="hero">
+        <div class="hero-kicker">Versión v9 ✨</div>
         <h2>Tu rutina, acompañada paso a paso.</h2>
         <p>Un espacio simple para sostener tu constancia, registrar tu progreso y saber cuándo es momento de continuar tu rutina.</p>
       </div>
@@ -244,10 +265,27 @@
         </div>
 
         <div class="field reminder-setup-box">
-          <label>Recordatorio de rutina</label>
-          <p class="privacy">Activá las notificaciones para que esta web pueda recordarte tu rutina en el horario elegido.</p>
+          <label>Centro de recordatorios</label>
+          <div class="status-card">
+            <div class="status-row">
+              <span class="status-dot" id="setupReminderDot"></span>
+              <div>
+                <b>Recordatorio de toma diaria</b><br>
+                Te avisa en el horario elegido si todavía no marcaste tu rutina.
+              </div>
+            </div>
+          </div>
+          <div class="status-card">
+            <div class="status-row">
+              <span class="status-dot" id="setupPhotoDot"></span>
+              <div>
+                <b>Recordatorio de fotos de progreso</b><br>
+                Para objetivos visuales, la app marca fotos sugeridas en día 15, 30 y próximas etapas según tu rutina.
+              </div>
+            </div>
+          </div>
           <button class="secondary" type="button" onclick="enableReminder()">Activar notificaciones</button>
-          <p class="privacy" id="reminderStatus">En esta prueba, el recordatorio funciona mejor mientras la web está abierta o instalada en el celular.</p>
+          <p class="privacy" id="reminderStatus">En esta versión, el aviso más seguro aparece dentro de la app. Las notificaciones del celular dependen del navegador y funcionan mejor si la web está abierta o instalada.</p>
         </div>
 
         <div class="hint" id="advisorHint">Si entraste desde el link de tu asesora, el WhatsApp de reposición ya queda asociado automáticamente.</div>
@@ -278,10 +316,37 @@
         <div class="day-badge" id="todayBadge">Día 1 ✨</div>
         <h2 id="todayTitle">Tu rutina de hoy</h2>
         <p id="todayCopy">Un día más construyendo constancia.</p>
+        <div class="mini-note" id="homeReminderStatus">Recordatorio pendiente de activar</div>
         <button onclick="markTaken()">Ya lo tomé ✨</button>
-        <button class="secondary" onclick="snooze()">Recordarme más tarde</button>
+        <button class="secondary" onclick="snooze()">Recordarme en 1 hora</button>
         <button class="ghost" onclick="retakeTomorrow()">Lo retomo mañana</button>
         <div class="message" id="dailyMessage"></div>
+      </div>
+
+      <div class="card smart-alert hide" id="smartAlertCard">
+        <h3 id="smartAlertTitle">Aviso importante</h3>
+        <p id="smartAlertCopy">Tenés una acción sugerida para hoy.</p>
+        <button id="smartAlertButton" onclick="go('photos')">Ver ahora</button>
+        <button class="secondary hide" id="smartAlertSecondary" onclick="enableReminder()">Activar recordatorio</button>
+      </div>
+
+      <div class="card routine-overview">
+        <h3>Tu plan de continuidad</h3>
+        <p>Todo lo importante de tu rutina en un solo lugar.</p>
+        <div class="routine-grid">
+          <div class="routine-tile">
+            <div class="routine-icon">⏰</div>
+            <div><strong>Toma diaria</strong><span id="routineTimeText">Horario elegido: 09:00</span></div>
+          </div>
+          <div class="routine-tile">
+            <div class="routine-icon">📸</div>
+            <div><strong>Fotos de progreso</strong><span id="routinePhotoText">Próxima foto: día 15</span></div>
+          </div>
+          <div class="routine-tile">
+            <div class="routine-icon">🛍️</div>
+            <div><strong>Reposición</strong><span id="routineReorderText">Te avisamos antes de cortar la rutina.</span></div>
+          </div>
+        </div>
       </div>
 
       <div class="card compact-card">
@@ -359,6 +424,7 @@
       <div class="card">
         <h3>Mis fotos</h3>
         <p id="photosCopy">Guardá tus fotos para comparar tu evolución en distintos momentos de tu rutina.</p>
+        <div class="photo-due-banner hide" id="photoDueBanner">Hoy tenés una foto de progreso disponible.</div>
         <div class="photo-grid" id="photoGrid"></div>
         <p class="privacy">En esta versión las fotos son privadas y locales del dispositivo. Para usarlo con clientas reales, lo correcto es sumar login, almacenamiento seguro y consentimiento.</p>
       </div>
@@ -410,10 +476,14 @@
       photos:{initial:'',15:'',30:'',60:'',90:'',120:'',150:'',180:'',270:'',360:''},
       advisorSummarySent:false,
       reminderEnabled:false,
+      photoReminderEnabled:true,
+      snoozeUntil:'',
       lastReminderDate:'',
-      lastPhotoReminderDate:''
+      lastPhotoReminderDate:'',
+      lastSnoozeReminder:''
     };
     let state = load();
+    let snoozeTimer = null;
     function applyAdvisorFromUrl(){
       const params = new URLSearchParams(window.location.search);
       const name = (params.get('asesora') || '').trim();
@@ -545,7 +615,14 @@
       showDaily(msg);
       render();
     }
-    function snooze(){ showDaily('Listo, te lo recordamos más tarde. Tu rutina se adapta a vos ✨'); }
+    function snooze(){
+      const oneHour = 60 * 60 * 1000;
+      state.snoozeUntil = new Date(Date.now() + oneHour).toISOString();
+      save();
+      showDaily('Listo, te lo recuerdo en 1 hora si esta web sigue abierta o instalada ✨');
+      setSnoozeTimer();
+      render();
+    }
     function retakeTomorrow(){
       const t = todayISO();
       if(!state.softDates.includes(t)) state.softDates.push(t);
@@ -637,21 +714,81 @@
       }
     }
 
+    function canNotify(){
+      return 'Notification' in window && Notification.permission === 'granted';
+    }
+    function notifyUser(title, body){
+      if(!canNotify()) return false;
+      try { new Notification(title, { body }); return true; }
+      catch(e){ return false; }
+    }
     function enableReminder(){
+      const status = document.getElementById('reminderStatus');
       if(!('Notification' in window)){
-        document.getElementById('reminderStatus').textContent = 'Este navegador no permite notificaciones web.';
+        if(status) status.textContent = 'Este navegador no permite notificaciones web. Igual vas a ver avisos dentro de la app.';
+        state.reminderEnabled = false;
+        save(); renderReminderStatus(); renderSmartAlert(routineDay());
         return;
       }
       Notification.requestPermission().then(permission => {
         if(permission === 'granted'){
           state.reminderEnabled = true;
+          state.photoReminderEnabled = true;
           save();
-          document.getElementById('reminderStatus').textContent = `Recordatorio activado para las ${state.reminderTime || '09:00'} mientras esta versión pueda notificarte.`;
-          new Notification('Mi Rutina Colagen ✨', { body: 'Recordatorio activado. Tu rutina ya está acompañada.' });
+          renderReminderStatus();
+          notifyUser('Mi Rutina Colagen ✨', 'Recordatorio activado. Te vamos a avisar la toma diaria y las fotos de progreso cuando correspondan.');
         } else {
-          document.getElementById('reminderStatus').textContent = 'No se activó el permiso de notificaciones. Podés probar nuevamente cuando quieras.';
+          state.reminderEnabled = false;
+          save();
+          if(status) status.textContent = 'No se activó el permiso del celular. Igual la app te va a mostrar avisos visuales cuando entres.';
+          renderReminderStatus();
         }
+        renderSmartAlert(routineDay());
       });
+    }
+    function renderReminderStatus(){
+      const status = document.getElementById('reminderStatus');
+      const homeStatus = document.getElementById('homeReminderStatus');
+      const setupDot = document.getElementById('setupReminderDot');
+      const setupPhotoDot = document.getElementById('setupPhotoDot');
+      const permission = ('Notification' in window) ? Notification.permission : 'unsupported';
+      const on = !!state.reminderEnabled && permission === 'granted';
+      if(status){
+        if(on) status.textContent = `Recordatorios activos a las ${state.reminderTime || '09:00'}. También vas a ver avisos dentro de la app para fotos y reposición.`;
+        else if(permission === 'denied') status.textContent = 'El permiso de notificaciones está bloqueado en este navegador. Los avisos dentro de la app siguen funcionando.';
+        else status.textContent = 'Activá las notificaciones para sumar aviso del celular. Si no las activás, la app igual te muestra avisos al entrar.';
+      }
+      if(homeStatus){
+        if(on) homeStatus.textContent = `⏰ Aviso activo ${state.reminderTime || '09:00'}`;
+        else homeStatus.textContent = '🔔 Avisos internos activos · notificación del celular pendiente';
+      }
+      if(setupDot) setupDot.classList.toggle('on', on);
+      if(setupPhotoDot) setupPhotoDot.classList.toggle('on', isVisualPath());
+    }
+    function setSnoozeTimer(){
+      if(snoozeTimer) clearTimeout(snoozeTimer);
+      if(!state.snoozeUntil) return;
+      const delay = new Date(state.snoozeUntil).getTime() - Date.now();
+      if(delay <= 0) return;
+      snoozeTimer = setTimeout(() => {
+        const today = todayISO();
+        if(state.takenDates.includes(today)) return;
+        state.lastSnoozeReminder = today;
+        save();
+        notifyUser('Mi Rutina Colagen ✨', 'Te recuerdo tu rutina. Un pasito más de constancia.');
+        showDaily('Te lo vuelvo a recordar ahora. Tocá “Ya lo tomé” cuando completes tu rutina ✨');
+        state.snoozeUntil = '';
+        save();
+        render();
+      }, delay);
+    }
+    function snoozeActive(){
+      return state.snoozeUntil && new Date(state.snoozeUntil).getTime() > Date.now();
+    }
+    function formatSnooze(){
+      if(!snoozeActive()) return '';
+      const d = new Date(state.snoozeUntil);
+      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     }
     function photoCheckpoints(){
       if(!isVisualPath()) return [];
@@ -673,26 +810,82 @@
       return state.photos[String(day)] ? null : day;
     }
     function reminderLoop(){
-      if(!state.reminderEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+      if(!state.reminderEnabled || !canNotify()) return;
+      if(snoozeActive()) return;
       const now = new Date();
       const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
       const today = todayISO();
       const photoDay = photoCheckpointDue();
-      if(hhmm === state.reminderTime && state.lastReminderDate !== today && !state.takenDates.includes(today)){
+      const needsRoutineReminder = !state.takenDates.includes(today);
+      const needsPhotoReminder = !!photoDay && state.lastPhotoReminderDate !== today;
+      if(hhmm === state.reminderTime && state.lastReminderDate !== today && (needsRoutineReminder || needsPhotoReminder)){
         state.lastReminderDate = today;
+        if(photoDay) state.lastPhotoReminderDate = today;
         save();
-        const body = photoDay
+        const body = photoDay && needsRoutineReminder
           ? `Es momento de tu rutina. Hoy también podés guardar tu foto del día ${photoDay}.`
-          : 'Es momento de tu rutina. Tocá para registrar tu constancia.';
-        new Notification('Mi Rutina Colagen ✨', { body });
-      }
-      if(hhmm === state.reminderTime && photoDay && state.lastPhotoReminderDate !== today){
-        state.lastPhotoReminderDate = today;
-        save();
-        new Notification('Mi Rutina Colagen ✨', { body: `Hoy podés guardar tu foto del día ${photoDay} para registrar tu progreso.` });
+          : photoDay
+            ? `Hoy podés guardar tu foto del día ${photoDay} para registrar tu progreso.`
+            : 'Es momento de tu rutina. Tocá para registrar tu constancia.';
+        notifyUser('Mi Rutina Colagen ✨', body);
       }
     }
-
+    function goPhotoDue(){ go('photos'); }
+    function renderSmartAlert(day){
+      const card = document.getElementById('smartAlertCard');
+      if(!card) return;
+      const title = document.getElementById('smartAlertTitle');
+      const copy = document.getElementById('smartAlertCopy');
+      const btn = document.getElementById('smartAlertButton');
+      const secondary = document.getElementById('smartAlertSecondary');
+      const photoDay = photoCheckpointDue();
+      const reorderDue = day >= reorderAlertDay();
+      const notificationOn = state.reminderEnabled && canNotify();
+      card.classList.remove('hide');
+      secondary.classList.add('hide');
+      if(photoDay){
+        title.textContent = `Hoy toca foto día ${photoDay} 📸`;
+        copy.textContent = 'Sacala con la misma luz y ángulo que la inicial. Este registro ayuda a que la clienta vea su evolución real.';
+        btn.textContent = 'Guardar foto ahora';
+        btn.setAttribute('onclick', 'goPhotoDue()');
+        return;
+      }
+      if(reorderDue){
+        title.textContent = 'Momento ideal para reponer 🛍️';
+        copy.textContent = 'La app detectó que estás cerca de cortar la rutina. Organizá la reposición con tu asesora.';
+        btn.textContent = 'Organizar reposición';
+        btn.setAttribute('onclick', "go('reorder')");
+        return;
+      }
+      if(!notificationOn){
+        title.textContent = 'Activá el recordatorio 🔔';
+        copy.textContent = 'La app ya te muestra avisos internos. Si activás notificaciones, también puede avisarte en el celular según el navegador.';
+        btn.textContent = 'Activar notificaciones';
+        btn.setAttribute('onclick', 'enableReminder()');
+        return;
+      }
+      card.classList.add('hide');
+    }
+    function renderHomeOverview(day){
+      const time = document.getElementById('routineTimeText');
+      const photo = document.getElementById('routinePhotoText');
+      const reorder = document.getElementById('routineReorderText');
+      if(time){
+        const extra = snoozeActive() ? ` · pausado hasta ${formatSnooze()}` : '';
+        time.textContent = `Horario elegido: ${state.reminderTime || '09:00'}${extra}`;
+      }
+      if(photo){
+        if(isVisualPath()){
+          const due = photoCheckpointDue();
+          const next = nextPhotoCheckpoint(day);
+          photo.textContent = due ? `Hoy toca foto día ${due}` : (next ? `Próxima foto sugerida: día ${next}` : 'Fotos de progreso completas por ahora');
+        } else photo.textContent = 'Opcionales según tu objetivo';
+      }
+      if(reorder){
+        const remaining = reorderAlertDay() - day;
+        reorder.textContent = remaining > 0 ? `Aviso de reposición en ${remaining} días aprox.` : 'Ya estás en momento de organizar continuidad.';
+      }
+    }
     function renderAdvisorBadge(){
       const badge = document.getElementById('advisorBadge');
       const hint = document.getElementById('advisorHint');
@@ -747,6 +940,9 @@
         ? `Como tu objetivo es visual, te sugerimos fotos según la duración de tu rutina: ${photoCheckpoints().length ? photoCheckpoints().map(d => 'día ' + d).join(', ') : 'cuando lo necesites'}.`
         : 'Las fotos son opcionales para tu objetivo. Podés usarlas si querés tener un registro extra.';
       document.getElementById('photosCopy').textContent = photosCopy;
+      renderReminderStatus();
+      renderSmartAlert(d);
+      renderHomeOverview(d);
       renderPhotos(); renderTimeline(d);
     }
     function actionSuggestion(day){
@@ -759,6 +955,12 @@
     }
     function renderPhotos(){
       const grid = document.getElementById('photoGrid');
+      const dueBanner = document.getElementById('photoDueBanner');
+      const due = photoCheckpointDue();
+      if(dueBanner){
+        dueBanner.classList.toggle('hide', !due);
+        dueBanner.textContent = due ? `Hoy tenés disponible la foto del día ${due}. Sacala con buena luz, mismo ángulo y sin filtro para comparar mejor.` : '';
+      }
       const slots = ['initial', ...photoCheckpoints().map(String)];
       if(grid){
         grid.innerHTML = slots.map(slot => {
@@ -805,6 +1007,7 @@
       document.getElementById('moment').value = state.moment || 'Con el desayuno';
       document.getElementById('reminderTime').value = state.reminderTime || '09:00';
       renderAdvisorBadge();
+      renderReminderStatus();
       document.querySelectorAll('#goals .choice').forEach(ch => ch.classList.toggle('selected', (state.goals || []).includes(ch.dataset.goal)));
       toggleCustomUnits();
     }
@@ -812,6 +1015,7 @@
       applyAdvisorFromUrl();
       fillSetupFields();
       if(state.onboarded) go('home'); else render();
+      setSnoozeTimer();
       setInterval(reminderLoop, 30000);
     }
     init();
