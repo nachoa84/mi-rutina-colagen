@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Mi Rutina Colagen v14 PWA</title>
+  <title>Mi Rutina Colagen v16 Test</title>
   <meta name="theme-color" content="#f6eee7" />
   <meta name="description" content="Seguimiento personalizado de rutina Colagen" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -214,7 +214,7 @@
 
     <section id="welcome" class="screen active">
       <div class="hero">
-        <div class="hero-kicker">App instalable ✨</div>
+        <div class="hero-kicker">App instalable · v16 ✨</div>
         <h2>Tu rutina, acompañada paso a paso.</h2>
         <p>Un espacio simple para sostener tu constancia, registrar tu progreso y saber cuándo es momento de continuar tu rutina.</p>
       </div>
@@ -545,6 +545,8 @@
         <div class="details-body">
           <p>Cambiá tu horario o los datos cuando quieras.</p>
           <button class="secondary" onclick="go('setup')">Modificar</button>
+          <button class="secondary" onclick="startNewRoutine()">Crear rutina nueva</button>
+          <button class="ghost" onclick="testNotificationNow()">Probar notificación ahora</button>
         </div>
       </details>
     </section>
@@ -944,43 +946,14 @@
       }
       catch(e){ return false; }
     }
-    function syncReminderSwitches(){
-      const reminderSwitch = document.getElementById('reminderSwitch');
-      const photoSwitch = document.getElementById('photoReminderSwitch');
-      const switchSummary = document.getElementById('switchSummary');
-      const canUsePermission = ('Notification' in window);
-      const permission = canUsePermission ? Notification.permission : 'unsupported';
-      const reminderOn = !!state.reminderEnabled && permission === 'granted';
-      const photoOn = !!state.photoReminderEnabled;
-      if(reminderSwitch){
-        reminderSwitch.checked = reminderOn;
-        reminderSwitch.disabled = !canUsePermission && !reminderOn;
-      }
-      if(photoSwitch){
-        photoSwitch.checked = photoOn;
-      }
-      if(switchSummary){
-        if(reminderOn && photoOn) switchSummary.textContent = 'Aviso diario y fotos activos';
-        else if(reminderOn) switchSummary.textContent = 'Aviso diario activo';
-        else if(photoOn) switchSummary.textContent = 'Fotos activas dentro de la app';
-        else switchSummary.textContent = 'Avisos dentro de la app';
-      }
-    }
-    function toggleReminderSwitch(checked){
-      if(checked){
+    function testNotificationNow(){
+      if(!canNotify()){
+        showDaily('Primero activá el permiso de notificaciones. Después volvé a probar ✨');
         enableReminder();
-      } else {
-        state.reminderEnabled = false;
-        save();
-        renderReminderStatus();
-        renderSmartAlert(routineDay());
+        return;
       }
-    }
-    function togglePhotoReminderSwitch(checked){
-      state.photoReminderEnabled = checked;
-      save();
-      renderReminderStatus();
-      render();
+      notifyUser('Mi Rutina Colagen ✨', 'Prueba de notificación. Si ves este aviso, el permiso está funcionando.');
+      showDaily('Notificación de prueba enviada ✨');
     }
 
     function enableReminder(){
