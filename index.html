@@ -242,6 +242,13 @@
           <input id="reminderTime" type="time" value="09:00" />
         </div>
 
+        <div class="field reminder-setup-box">
+          <label>Recordatorio de rutina</label>
+          <p class="privacy">Activá las notificaciones para que esta web pueda recordarte tu rutina en el horario elegido.</p>
+          <button class="secondary" type="button" onclick="enableReminder()">Activar notificaciones</button>
+          <p class="privacy" id="reminderStatus">En esta prueba, el recordatorio funciona mejor mientras la web está abierta o instalada en el celular.</p>
+        </div>
+
         <div class="hint" id="advisorHint">Si entraste desde el link de tu asesora, el WhatsApp de reposición ya queda asociado automáticamente.</div>
 
         <button onclick="saveSetup()">Guardar mi rutina</button>
@@ -320,12 +327,10 @@
       </div>
 
       <details class="card compact-card">
-        <summary>Ajustes y recordatorio</summary>
+        <summary>Ajustes de mi rutina</summary>
         <div class="details-body">
-          <p>Podés cambiar tu horario, lo que compraste o activar un recordatorio web.</p>
+          <p>Podés cambiar el horario, lo que compraste o algún dato de tu seguimiento cuando lo necesites.</p>
           <button class="secondary" onclick="go('setup')">Realizar modificaciones</button>
-          <button class="secondary" onclick="enableReminder()">Activar recordatorio web</button>
-          <p class="privacy" id="reminderStatus">En esta prueba, el recordatorio funciona mejor mientras la web está abierta o instalada en el celular.</p>
         </div>
       </details>
     </section>
