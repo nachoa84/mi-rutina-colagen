@@ -186,6 +186,7 @@
             <option value="1">1 Colagen</option>
             <option value="3">Kit de 3</option>
             <option value="6">Kit de 6</option>
+            <option value="12">Kit de 12</option>
             <option value="custom">Combo personalizado</option>
           </select>
         </div>
@@ -358,32 +359,7 @@
       <div class="card">
         <h3>Mis fotos</h3>
         <p id="photosCopy">Guardá tus fotos para comparar tu evolución en distintos momentos de tu rutina.</p>
-        <div class="photo-grid">
-          <div class="photo-card">
-            <h4>Inicial</h4>
-            <div class="photo-preview" id="preview_initial_tab">Sin foto todavía</div>
-            <input class="file-input" id="file_initial_tab" type="file" accept="image/*" capture="user" onchange="uploadPhoto('initial','_tab')" />
-            <button class="mini-btn secondary" onclick="document.getElementById('file_initial_tab').click()">Tomar o subir</button>
-          </div>
-          <div class="photo-card">
-            <h4>Día 30</h4>
-            <div class="photo-preview" id="preview_30">Disponible día 30</div>
-            <input class="file-input" id="file_30" type="file" accept="image/*" capture="user" onchange="uploadPhoto('30')" />
-            <button class="mini-btn secondary" onclick="document.getElementById('file_30').click()">Tomar o subir</button>
-          </div>
-          <div class="photo-card">
-            <h4>Día 60</h4>
-            <div class="photo-preview" id="preview_60">Disponible día 60</div>
-            <input class="file-input" id="file_60" type="file" accept="image/*" capture="user" onchange="uploadPhoto('60')" />
-            <button class="mini-btn secondary" onclick="document.getElementById('file_60').click()">Tomar o subir</button>
-          </div>
-          <div class="photo-card">
-            <h4>Día 90</h4>
-            <div class="photo-preview" id="preview_90">Disponible día 90</div>
-            <input class="file-input" id="file_90" type="file" accept="image/*" capture="user" onchange="uploadPhoto('90')" />
-            <button class="mini-btn secondary" onclick="document.getElementById('file_90').click()">Tomar o subir</button>
-          </div>
-        </div>
+        <div class="photo-grid" id="photoGrid"></div>
         <p class="privacy">En esta versión las fotos son privadas y locales del dispositivo. Para usarlo con clientas reales, lo correcto es sumar login, almacenamiento seguro y consentimiento.</p>
       </div>
     </section>
@@ -431,10 +407,11 @@
       takenDates:[],
       softDates:[],
       checkins:[],
-      photos:{initial:'',30:'',60:'',90:''},
+      photos:{initial:'',15:'',30:'',60:'',90:'',120:'',150:'',180:'',270:'',360:''},
       advisorSummarySent:false,
       reminderEnabled:false,
-      lastReminderDate:''
+      lastReminderDate:'',
+      lastPhotoReminderDate:''
     };
     let state = load();
     function applyAdvisorFromUrl(){
@@ -449,7 +426,10 @@
     }
 
     function load(){
-      try { return {...defaultState, ...(JSON.parse(localStorage.getItem(KEY)) || {})}; }
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY)) || {};
+        return {...defaultState, ...saved, photos:{...defaultState.photos, ...(saved.photos || {})}};
+      }
       catch(e){ return {...defaultState}; }
     }
     function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
@@ -486,7 +466,9 @@
         const ok = confirm('Esto va a crear una rutina nueva y reemplazar el seguimiento guardado en este dispositivo. ¿Querés continuar?');
         if(!ok) return;
       }
-      state = {...defaultState, startDate: todayISO()};
+      const advisorName = state.advisorName;
+      const advisorPhone = state.advisorPhone;
+      state = {...defaultState, advisorName, advisorPhone, startDate: todayISO()};
       save();
       fillSetupFields();
       go('recommendations');
@@ -585,7 +567,12 @@
         30:'¡Primer mes completado! Gran momento para mirar tu progreso ✨',
         45:'¡45 días acompañando tu rutina! Vas construyendo un proceso real ✨',
         60:'¡60 días sosteniendo tu proceso! La constancia habla por vos ✨',
-        90:'¡90 días de rutina Colagen! Celebrá este compromiso con vos ✨'
+        90:'¡90 días de rutina Colagen! Celebrá este compromiso con vos ✨',
+        120:'¡120 días sosteniendo tu rutina! Tu constancia sigue creciendo ✨',
+        150:'¡150 días de proceso! Un gran momento para registrar cómo venís ✨',
+        180:'¡6 meses de rutina Colagen! Celebrá este camino con vos ✨',
+        270:'¡9 meses de constancia! Tu proceso ya tiene historia ✨',
+        360:'¡12 meses acompañando tu rutina! Qué hermoso compromiso ✨'
       };
       return messages[day];
     }
@@ -623,6 +610,7 @@
       if(state.purchase === '1') return '1 Colagen';
       if(state.purchase === '3') return 'Kit de 3';
       if(state.purchase === '6') return 'Kit de 6';
+      if(state.purchase === '12') return 'Kit de 12';
       if(state.purchase === 'custom') return `Combo personalizado (${state.customUnits || 1} unidades)`;
       return state.purchase || 'Colagen';
     }
@@ -665,15 +653,43 @@
         }
       });
     }
+    function photoCheckpoints(){
+      if(!isVisualPath()) return [];
+      const days = totalDays();
+      if(days <= 35) return [15,30];
+      if(days <= 100) return [15,30,60,90];
+      if(days <= 200) return [15,30,60,90,120,150,180];
+      return [15,30,60,90,180,270,360];
+    }
+    function nextPhotoCheckpoint(day = routineDay()){
+      const checkpoints = photoCheckpoints();
+      return checkpoints.find(d => d >= day && !state.photos[String(d)]) || null;
+    }
+    function photoCheckpointDue(){
+      if(!isVisualPath()) return null;
+      const day = routineDay();
+      const checkpoints = photoCheckpoints();
+      if(!checkpoints.includes(day)) return null;
+      return state.photos[String(day)] ? null : day;
+    }
     function reminderLoop(){
       if(!state.reminderEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
       const now = new Date();
       const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
       const today = todayISO();
+      const photoDay = photoCheckpointDue();
       if(hhmm === state.reminderTime && state.lastReminderDate !== today && !state.takenDates.includes(today)){
         state.lastReminderDate = today;
         save();
-        new Notification('Mi Rutina Colagen ✨', { body: 'Es momento de tu rutina. Tocá para registrar tu constancia.' });
+        const body = photoDay
+          ? `Es momento de tu rutina. Hoy también podés guardar tu foto del día ${photoDay}.`
+          : 'Es momento de tu rutina. Tocá para registrar tu constancia.';
+        new Notification('Mi Rutina Colagen ✨', { body });
+      }
+      if(hhmm === state.reminderTime && photoDay && state.lastPhotoReminderDate !== today){
+        state.lastPhotoReminderDate = today;
+        save();
+        new Notification('Mi Rutina Colagen ✨', { body: `Hoy podés guardar tu foto del día ${photoDay} para registrar tu progreso.` });
       }
     }
 
@@ -710,10 +726,10 @@
       const shareCard = document.getElementById('shareCard');
       if(shareCard) shareCard.classList.toggle('hide', !!state.advisorSummarySent || !state.advisorPhone || !state.name);
       document.getElementById('streakText').textContent = streak();
-      const nextPhoto = d < 30 ? 'Día 30' : d < 60 ? 'Día 60' : d < 90 ? 'Día 90' : 'Lista';
-      document.getElementById('nextPhotoText').textContent = isVisualPath() ? nextPhoto : 'Opcional';
+      const nextPhoto = nextPhotoCheckpoint(d);
+      document.getElementById('nextPhotoText').textContent = isVisualPath() ? (nextPhoto ? `Día ${nextPhoto}` : 'Lista') : 'Opcional';
 
-      const checkinDue = [10,15,30,45,60,75,90,120,150].includes(d) && !state.checkins.some(c => c.day === d);
+      const checkinDue = [10,15,30,45,60,75,90,120,150,180,270,360].includes(d) && !state.checkins.some(c => c.day === d);
       document.getElementById('checkinCard').classList.toggle('hide', !checkinDue);
 
       const suggestion = actionSuggestion(d);
@@ -728,7 +744,7 @@
       document.getElementById('reorderCopy').textContent = `Tu rutina actual está estimada para ${totalDays()} días según lo que cargaste.`;
 
       const photosCopy = isVisualPath()
-        ? 'Como tu objetivo es visual, estas fotos te ayudan a comparar tu evolución con más claridad.'
+        ? `Como tu objetivo es visual, te sugerimos fotos según la duración de tu rutina: ${photoCheckpoints().length ? photoCheckpoints().map(d => 'día ' + d).join(', ') : 'cuando lo necesites'}.`
         : 'Las fotos son opcionales para tu objetivo. Podés usarlas si querés tener un registro extra.';
       document.getElementById('photosCopy').textContent = photosCopy;
       renderPhotos(); renderTimeline(d);
@@ -736,22 +752,44 @@
     function actionSuggestion(day){
       if(!state.onboarded) return 'Configurá tu rutina para recibir una sugerencia personalizada.';
       if(day >= reorderAlertDay()) return 'Estás en momento de organizar tu reposición para continuar tu rutina.';
-      if(isVisualPath() && [30,60,90].includes(day)) return `Hoy es un buen momento para guardar tu foto del día ${day} y mirar tu progreso.`;
-      if([10,15,30,45,60,75,90].includes(day)) return 'Hoy tenés un chequeo disponible para registrar cómo venís.';
+      if(isVisualPath() && photoCheckpoints().includes(day)) return `Hoy es un buen momento para guardar tu foto del día ${day} y mirar tu progreso.`;
+      if([10,15,30,45,60,75,90,120,150,180,270,360].includes(day)) return 'Hoy tenés un chequeo disponible para registrar cómo venís.';
       if(streak() >= 7) return 'Vas muy bien con tu racha. Celebrá este compromiso con vos ✨';
       return 'Marcá tu rutina de hoy y seguí construyendo constancia.';
     }
     function renderPhotos(){
-      ['initial','30','60','90'].forEach(slot => {
+      const grid = document.getElementById('photoGrid');
+      const slots = ['initial', ...photoCheckpoints().map(String)];
+      if(grid){
+        grid.innerHTML = slots.map(slot => {
+          const label = slot === 'initial' ? 'Inicial' : `Día ${slot}`;
+          const available = slot === 'initial' || routineDay() >= Number(slot);
+          const preview = state.photos[slot]
+            ? `<img src="${state.photos[slot]}" alt="Foto ${label}">`
+            : (slot === 'initial' ? 'Sin foto todavía' : (available ? `Lista para guardar` : `Disponible día ${slot}`));
+          const disabled = available ? '' : 'disabled';
+          const btnClass = available ? 'mini-btn secondary' : 'mini-btn ghost';
+          return `<div class="photo-card">
+            <h4>${label}</h4>
+            <div class="photo-preview" id="preview_${slot}_tab">${preview}</div>
+            <input class="file-input" id="file_${slot}_tab" type="file" accept="image/*" capture="user" onchange="uploadPhoto('${slot}','_tab')" />
+            <button class="${btnClass}" ${disabled} onclick="document.getElementById('file_${slot}_tab').click()">${available ? 'Tomar o subir' : 'Más adelante'}</button>
+          </div>`;
+        }).join('');
+      }
+      ['initial', ...photoCheckpoints().map(String)].forEach(slot => {
         const html = state.photos[slot] ? `<img src="${state.photos[slot]}" alt="Foto ${slot}">` : (slot === 'initial' ? 'Sin foto todavía' : `Disponible día ${slot}`);
         const p = document.getElementById(`preview_${slot}`); if(p) p.innerHTML = html;
-        const pt = document.getElementById(`preview_${slot}_tab`); if(pt) pt.innerHTML = html;
+        const pt = document.getElementById(`preview_${slot}_tab`); if(pt && !grid) pt.innerHTML = html;
       });
     }
     function renderTimeline(day){
       const items = [];
       items.push({n:'✓', title:'Rutina diaria', copy:`Horario elegido: ${state.reminderTime || '09:00'}`});
-      if(isVisualPath()) items.push({n:'30', title:'Próxima foto', copy: day < 30 ? `Faltan ${30-day} días para tu foto día 30.` : 'Ya podés subir tus fotos de progreso.'});
+      if(isVisualPath()){
+        const nextSlot = nextPhotoCheckpoint(day);
+        items.push({n: nextSlot ? String(nextSlot) : '✓', title:'Próxima foto', copy: nextSlot ? `Faltan ${Math.max(0,nextSlot-day)} días para tu foto día ${nextSlot}.` : 'Ya tenés disponibles tus fotos de progreso.'});
+      }
       items.push({n:'↻', title:'Reposición', copy: day < reorderAlertDay() ? `Aviso sugerido en día ${reorderAlertDay()}.` : 'Momento ideal para organizar continuidad.'});
       items.push({n:'♡', title:'Chequeos', copy:'Cada 10/15 días registramos cómo venís sintiendo tu rutina.'});
       document.getElementById('timeline').innerHTML = items.map(i => `<div class="step"><div class="num">${i.n}</div><div><strong>${i.title}</strong><span>${i.copy}</span></div></div>`).join('');
