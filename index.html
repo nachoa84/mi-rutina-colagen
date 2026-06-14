@@ -75,7 +75,6 @@
     .day-badge{display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:999px; background:#f4e2d7; color:#714b3e; padding:8px 12px; font-weight:850; font-size:13px; margin-bottom:10px}
     .today-card h2{font-size:28px; margin:0 0 8px; letter-spacing:-.7px}
     .today-card p{font-size:15px}
-    .today-card .mini-note{display:inline-flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; padding:8px 12px; border-radius:999px; background:#fff7f1; border:1px solid var(--line); color:var(--muted); font-size:12px; font-weight:800}
     .routine-overview{background:linear-gradient(145deg,#fffdfb,#fff7f1)}
     .routine-grid{display:grid; grid-template-columns:1fr; gap:10px; margin-top:12px}
     .routine-tile{display:flex; gap:12px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:19px; padding:13px}
@@ -375,8 +374,7 @@
       <div class="card today-card">
         <div class="day-badge" id="todayBadge">Día 1 ✨</div>
         <h2 id="todayTitle">Tu rutina de hoy</h2>
-        <p id="todayCopy">Un día más construyendo constancia.</p>
-        <div class="mini-note" id="homeReminderStatus">Recordatorio pendiente de activar</div>
+        <p id="todayCopy">Horario: 09:00</p>
         <button onclick="markTaken()">Ya lo tomé ✨</button>
         <button class="secondary" onclick="snooze()">Recordarme en 1 hora</button>
         <button class="ghost" onclick="retakeTomorrow()">Lo retomo mañana</button>
@@ -384,34 +382,34 @@
       </div>
 
       <div class="card smart-alert hide" id="smartAlertCard">
-        <h3 id="smartAlertTitle">Aviso importante</h3>
-        <p id="smartAlertCopy">Tenés una acción sugerida para hoy.</p>
+        <h3 id="smartAlertTitle">Hoy</h3>
+        <p id="smartAlertCopy">Tenés una acción pendiente.</p>
         <button id="smartAlertButton" onclick="go('photos')">Ver ahora</button>
         <button class="secondary hide" id="smartAlertSecondary" onclick="enableReminder()">Activar recordatorio</button>
       </div>
 
       <div class="card routine-overview">
-        <h3>Tu plan de continuidad</h3>
-        <p>Todo lo importante de tu rutina en un solo lugar.</p>
+        <h3>Próximos pasos</h3>
+        <p>Lo más importante de tu rutina.</p>
         <div class="routine-grid">
           <div class="routine-tile">
             <div class="routine-icon">⏰</div>
-            <div><strong>Toma diaria</strong><span id="routineTimeText">Horario elegido: 09:00</span></div>
+            <div><strong>Toma</strong><span id="routineTimeText">Todos los días · 09:00</span></div>
           </div>
           <div class="routine-tile">
             <div class="routine-icon">📸</div>
-            <div><strong>Fotos de progreso</strong><span id="routinePhotoText">Próxima foto: día 15</span></div>
+            <div><strong>Fotos</strong><span id="routinePhotoText">Próxima: día 15</span></div>
           </div>
           <div class="routine-tile">
             <div class="routine-icon">🛍️</div>
-            <div><strong>Reposición</strong><span id="routineReorderText">Te avisamos antes de cortar la rutina.</span></div>
+            <div><strong>Reposición</strong><span id="routineReorderText">Te avisamos con tiempo.</span></div>
           </div>
         </div>
       </div>
 
       <div class="card compact-card">
         <h3>Mi avance</h3>
-        <p id="actionSuggestion">Marcá tu rutina de hoy y seguí construyendo constancia.</p>
+        <p id="actionSuggestion">Tu constancia hasta hoy.</p>
         <div class="mini-progress-line">
           <span>Días registrados</span>
           <b id="miniTakenText">0</b>
@@ -453,10 +451,10 @@
       </div>
 
       <details class="card compact-card">
-        <summary>Ajustes de mi rutina</summary>
+        <summary>Editar rutina</summary>
         <div class="details-body">
-          <p>Podés cambiar el horario, lo que compraste o algún dato de tu seguimiento cuando lo necesites.</p>
-          <button class="secondary" onclick="go('setup')">Realizar modificaciones</button>
+          <p>Cambiá tu horario o los datos cuando quieras.</p>
+          <button class="secondary" onclick="go('setup')">Modificar</button>
         </div>
       </details>
     </section>
@@ -820,7 +818,7 @@
       }
       if(homeStatus){
         if(on) homeStatus.textContent = `⏰ Aviso activo ${state.reminderTime || '09:00'}`;
-        else homeStatus.textContent = '🔔 Avisos internos activos · notificación del celular pendiente';
+        else homeStatus.textContent = '🔔 Avisos dentro de la app';
       }
       if(setupDot) setupDot.classList.toggle('on', on);
       if(setupPhotoDot) setupPhotoDot.classList.toggle('on', isVisualPath());
@@ -904,24 +902,17 @@
       card.classList.remove('hide');
       secondary.classList.add('hide');
       if(photoDay){
-        title.textContent = `Hoy toca foto día ${photoDay} 📸`;
-        copy.textContent = 'Sacala con la misma luz y ángulo que la inicial. Este registro ayuda a que la clienta vea su evolución real.';
+        title.textContent = 'Foto pendiente 📸';
+        copy.textContent = `Hoy podés guardar tu foto del día ${photoDay}.`; 
         btn.textContent = 'Guardar foto ahora';
         btn.setAttribute('onclick', 'goPhotoDue()');
         return;
       }
       if(reorderDue){
-        title.textContent = 'Momento ideal para reponer 🛍️';
-        copy.textContent = 'La app detectó que estás cerca de cortar la rutina. Organizá la reposición con tu asesora.';
+        title.textContent = 'Reposición 🛍️';
+        copy.textContent = 'Ya podés organizar tu reposición.';
         btn.textContent = 'Organizar reposición';
         btn.setAttribute('onclick', "go('reorder')");
-        return;
-      }
-      if(!notificationOn){
-        title.textContent = 'Activá el recordatorio 🔔';
-        copy.textContent = 'La app ya te muestra avisos internos. Si activás notificaciones, también puede avisarte en el celular según el navegador.';
-        btn.textContent = 'Activar notificaciones';
-        btn.setAttribute('onclick', 'enableReminder()');
         return;
       }
       card.classList.add('hide');
@@ -931,19 +922,19 @@
       const photo = document.getElementById('routinePhotoText');
       const reorder = document.getElementById('routineReorderText');
       if(time){
-        const extra = snoozeActive() ? ` · pausado hasta ${formatSnooze()}` : '';
-        time.textContent = `Horario elegido: ${state.reminderTime || '09:00'}${extra}`;
+        const extra = snoozeActive() ? ` · hasta ${formatSnooze()}` : '';
+        time.textContent = `Todos los días · ${state.reminderTime || '09:00'}${extra}`;
       }
       if(photo){
         if(isVisualPath()){
           const due = photoCheckpointDue();
           const next = nextPhotoCheckpoint(day);
-          photo.textContent = due ? `Hoy toca foto día ${due}` : (next ? `Próxima foto sugerida: día ${next}` : 'Fotos de progreso completas por ahora');
-        } else photo.textContent = 'Opcionales según tu objetivo';
+          photo.textContent = due ? `Hoy · día ${due}` : (next ? `Próxima · día ${next}` : 'Al día');
+        } else photo.textContent = 'Opcional';
       }
       if(reorder){
         const remaining = reorderAlertDay() - day;
-        reorder.textContent = remaining > 0 ? `Aviso de reposición en ${remaining} días aprox.` : 'Ya estás en momento de organizar continuidad.';
+        reorder.textContent = remaining > 0 ? `En ${remaining} días aprox.` : 'Ya podés reponer';
       }
     }
     function renderAdvisorBadge(){
@@ -966,7 +957,7 @@
       document.getElementById('topDay').textContent = `Día ${d}`;
       document.getElementById('todayBadge').textContent = `Día ${d} ✨`;
       document.getElementById('todayTitle').textContent = state.name ? `${state.name}, tu rutina de hoy` : 'Tu rutina de hoy';
-      document.getElementById('todayCopy').textContent = state.reminderTime ? `Tu horario elegido es ${state.reminderTime}. Un día más construyendo constancia.` : 'Un día más construyendo constancia.';
+      document.getElementById('todayCopy').textContent = state.reminderTime ? `Horario: ${state.reminderTime}` : 'Tu rutina de hoy';
       const elapsed = d;
       const taken = state.takenDates.filter(x => state.startDate ? x >= state.startDate : true).length;
       const pct = Math.min(100, Math.round((taken / Math.max(1, elapsed)) * 100));
@@ -1006,12 +997,12 @@
       renderPhotos(); renderTimeline(d);
     }
     function actionSuggestion(day){
-      if(!state.onboarded) return 'Configurá tu rutina para recibir una sugerencia personalizada.';
-      if(day >= reorderAlertDay()) return 'Estás en momento de organizar tu reposición para continuar tu rutina.';
-      if(isVisualPath() && photoCheckpoints().includes(day)) return `Hoy es un buen momento para guardar tu foto del día ${day} y mirar tu progreso.`;
-      if([10,15,30,45,60,75,90,120,150,180,270,360].includes(day)) return 'Hoy tenés un chequeo disponible para registrar cómo venís.';
-      if(streak() >= 7) return 'Vas muy bien con tu racha. Celebrá este compromiso con vos ✨';
-      return 'Marcá tu rutina de hoy y seguí construyendo constancia.';
+      if(!state.onboarded) return 'Tu constancia.';
+      if(day >= reorderAlertDay()) return 'Momento de reponer.';
+      if(isVisualPath() && photoCheckpoints().includes(day)) return `Hoy podés subir tu foto del día ${day}.`;
+      if([10,15,30,45,60,75,90,120,150,180,270,360].includes(day)) return 'Hoy tenés un chequeo.';
+      if(streak() >= 7) return 'Muy buena constancia ✨';
+      return 'Tu constancia hasta hoy.';
     }
     function renderPhotos(){
       const grid = document.getElementById('photoGrid');
