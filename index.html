@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Mi Rutina Colagen</title>
+  <meta name="theme-color" content="#f6eee7" />
+  <style>
+    :root{
+      --bg:#fbf6f1;
+      --card:#fffdfb;
+      --text:#31241f;
+      --muted:#7b6a62;
+      --soft:#f1dfd2;
+      --soft2:#f7ebe3;
+      --accent:#b9876e;
+      --accent2:#8d5f4f;
+      --line:#ead8cb;
+      --success:#6e8c74;
+      --shadow: 0 18px 45px rgba(84, 55, 41, .12);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; padding:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;}
+    body{min-height:100vh;}
+    .app{max-width:460px; margin:0 auto; min-height:100vh; position:relative; padding:16px 14px 92px; background:
+      radial-gradient(circle at 20% -10%, #fff 0, rgba(255,255,255,.5) 28%, transparent 52%),
+      linear-gradient(180deg, #fbf3ec 0%, #fbf6f1 34%, #f8eee8 100%);
+    }
+    .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 2px 14px; position:sticky; top:0; z-index:5; background:linear-gradient(180deg, rgba(251,246,241,.98), rgba(251,246,241,.82)); backdrop-filter:blur(10px)}
+    .brand{display:flex; align-items:center; gap:10px;}
+    .logo{width:42px; height:42px; border-radius:16px; background:linear-gradient(135deg,#e8c8b5,#fff4ed); box-shadow:0 8px 20px rgba(137,94,74,.16); display:grid; place-items:center; font-weight:800; color:var(--accent2); letter-spacing:.5px}
+    h1{font-size:22px; margin:0; letter-spacing:-.4px; line-height:1.05}
+    .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
+    .pill{border:1px solid var(--line); padding:7px 10px; border-radius:999px; color:var(--accent2); background:rgba(255,255,255,.6); font-size:12px; font-weight:700; white-space:nowrap}
+    .screen{display:none; animation:fade .25s ease both;}
+    .screen.active{display:block}
+    @keyframes fade{from{opacity:0; transform:translateY(5px)} to{opacity:1; transform:none}}
+    .hero{border-radius:30px; padding:26px 22px; background:linear-gradient(145deg,#fffdfb,#f4e1d5); box-shadow:var(--shadow); overflow:hidden; position:relative; margin:8px 0 16px;}
+    .hero:after{content:""; position:absolute; width:190px; height:190px; border-radius:50%; right:-80px; top:-70px; background:rgba(255,255,255,.48)}
+    .hero h2{position:relative; margin:0 0 10px; font-size:32px; line-height:1; letter-spacing:-1px; max-width:320px}
+    .hero p{position:relative; margin:0; color:var(--muted); line-height:1.45; font-size:15px; max-width:340px}
+    .card{background:rgba(255,253,251,.92); border:1px solid rgba(234,216,203,.8); border-radius:var(--radius); padding:18px; box-shadow:0 10px 28px rgba(84,55,41,.08); margin:12px 0;}
+    .card h3{margin:0 0 10px; font-size:19px; letter-spacing:-.3px}
+    .card p{margin:8px 0; color:var(--muted); line-height:1.45; font-size:14px}
+    .hint{font-size:13px; color:var(--muted); line-height:1.45; background:#fff6ef; border:1px dashed #e1c3b0; padding:12px; border-radius:16px; margin-top:10px}
+    .list{display:grid; gap:9px; margin-top:12px}
+    .rec{display:flex; gap:10px; align-items:flex-start; color:var(--muted); font-size:14px; line-height:1.35}
+    .rec b{color:var(--text)}
+    .dot{width:22px; min-width:22px; height:22px; border-radius:8px; background:var(--soft2); color:var(--accent2); display:grid; place-items:center; font-size:12px; font-weight:800}
+    button,.button{appearance:none; border:0; width:100%; border-radius:18px; background:var(--accent2); color:#fff; padding:15px 16px; font-weight:800; font-size:15px; margin-top:12px; cursor:pointer; box-shadow:0 12px 24px rgba(141,95,79,.22); text-align:center; text-decoration:none; display:block}
+    button.secondary,.button.secondary{background:#fff; color:var(--accent2); border:1px solid var(--line); box-shadow:none}
+    button.ghost{background:transparent; color:var(--accent2); border:1px solid var(--line); box-shadow:none}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .field{margin:13px 0}
+    label{display:block; font-size:13px; font-weight:800; margin-bottom:8px; color:#4a3830}
+    input,select,textarea{width:100%; border:1px solid var(--line); background:#fff; border-radius:16px; padding:13px 14px; font-size:15px; color:var(--text); outline:none}
+    textarea{min-height:84px; resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:#c69a83; box-shadow:0 0 0 4px rgba(185,135,110,.12)}
+    .choice-grid{display:grid; gap:9px}
+    .choice{border:1px solid var(--line); background:#fff; border-radius:17px; padding:13px 14px; font-weight:750; font-size:14px; color:#4b372f; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:.18s ease}
+    .choice small{color:var(--muted); font-weight:600}
+    .choice.selected{background:#f4e2d7; border-color:#d0a78f; color:#6d4538}
+    .choice.selected:after{content:"✓"; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--accent2); color:#fff; font-size:13px}
+    .progress-ring{width:154px; height:154px; border-radius:50%; margin:12px auto; background:conic-gradient(var(--accent2) calc(var(--pct)*1%), #ead8cb 0); display:grid; place-items:center; box-shadow:inset 0 0 0 14px rgba(255,255,255,.85)}
+    .progress-inner{width:112px; height:112px; border-radius:50%; background:#fffdfb; display:grid; place-items:center; text-align:center; padding:12px; box-shadow:0 4px 18px rgba(84,55,41,.08)}
+    .progress-inner strong{font-size:28px; line-height:1; display:block; color:var(--accent2)}
+    .progress-inner span{font-size:12px; color:var(--muted); font-weight:700}
+    .stats{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+    .stat{background:#fff7f1; border:1px solid var(--line); border-radius:18px; padding:13px; min-height:76px}
+    .stat strong{font-size:20px; display:block; color:#4b372f}
+    .stat span{font-size:12px; color:var(--muted); font-weight:700}
+    .today-card{text-align:center; padding:22px 18px}
+    .day-badge{display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:999px; background:#f4e2d7; color:#714b3e; padding:8px 12px; font-weight:850; font-size:13px; margin-bottom:10px}
+    .today-card h2{font-size:28px; margin:0 0 8px; letter-spacing:-.7px}
+    .today-card p{font-size:15px}
+    .message{display:none; background:#f0f6ef; border:1px solid #c8dac8; color:#4d664f; border-radius:17px; padding:13px; margin-top:12px; font-weight:750; line-height:1.35}
+    .message.show{display:block}
+    .photo-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .photo-card{background:#fff; border:1px solid var(--line); border-radius:18px; padding:12px; min-height:168px; display:flex; flex-direction:column; gap:9px}
+    .photo-card h4{margin:0; font-size:14px}
+    .photo-preview{height:108px; border-radius:14px; background:#fbf1ea; border:1px dashed #ddbcaa; display:grid; place-items:center; overflow:hidden; color:var(--muted); font-size:12px; text-align:center; padding:8px}
+    .photo-preview img{width:100%; height:100%; object-fit:cover}
+    .file-input{display:none}
+    .mini-btn{font-size:12px; padding:10px; border-radius:13px; margin-top:0; box-shadow:none}
+    .timeline{display:grid; gap:10px; margin-top:12px}
+    .step{display:flex; gap:10px; align-items:flex-start; padding:12px; border-radius:17px; background:#fff7f1; border:1px solid var(--line)}
+    .step .num{width:28px; height:28px; border-radius:10px; background:#fff; color:var(--accent2); display:grid; place-items:center; font-size:12px; font-weight:850; border:1px solid var(--line); flex:none}
+    .step strong{display:block; font-size:14px}
+    .step span{display:block; color:var(--muted); font-size:12px; margin-top:2px}
+    .nav{position:fixed; left:50%; transform:translateX(-50%); bottom:0; width:min(460px,100%); background:rgba(255,253,251,.94); backdrop-filter:blur(14px); border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); padding:8px 8px max(8px, env(safe-area-inset-bottom)); z-index:20}
+    .nav button{box-shadow:none; background:transparent; color:var(--muted); margin:0; padding:8px 4px; border-radius:14px; font-size:11px; font-weight:800}
+    .nav button span{display:block; font-size:20px; line-height:1.05; margin-bottom:2px}
+    .nav button.active{background:#f4e2d7; color:var(--accent2)}
+    .hide{display:none!important}
+    .privacy{font-size:12px!important; color:var(--muted); border-top:1px solid var(--line); padding-top:10px; margin-top:12px!important}
+    .admin-toggle{font-size:12px; color:var(--accent2); text-decoration:underline; cursor:pointer; margin-top:10px; display:inline-block}
+    .link-box{word-break:break-all; background:#fff7f1; border:1px solid var(--line); border-radius:16px; padding:12px; color:var(--accent2); font-weight:800; font-size:13px; line-height:1.35}
+    .advisor-badge{display:none; border:1px solid var(--line); background:#fff7f1; border-radius:18px; padding:12px; margin-top:12px; color:var(--muted); font-size:13px; line-height:1.4}
+    .advisor-badge.show{display:block}
+    .compact-card{padding:14px 16px}
+    .compact-card h3{font-size:16px; margin-bottom:6px}
+    .mini-progress-line{display:flex; justify-content:space-between; gap:10px; align-items:center; background:#fff7f1; border:1px solid var(--line); border-radius:16px; padding:12px; margin-top:10px; color:var(--muted); font-size:13px}
+    .mini-progress-line b{color:var(--accent2); font-size:16px}
+    details.card{padding:0; overflow:hidden}
+    details.card summary{list-style:none; padding:16px 18px; cursor:pointer; font-weight:850; color:var(--accent2); display:flex; justify-content:space-between; align-items:center}
+    details.card summary::-webkit-details-marker{display:none}
+    details.card summary:after{content:'+'; width:24px; height:24px; border-radius:50%; background:#f4e2d7; display:grid; place-items:center; color:var(--accent2)}
+    details.card[open] summary:after{content:'−'}
+    details.card .details-body{padding:0 18px 18px}
+    .tiny-action{margin-top:10px; font-size:13px; color:var(--accent2); font-weight:800; text-decoration:underline; cursor:pointer; display:inline-block}
+    .client-list{display:grid; gap:10px}
+    .client-mini{padding:13px; border:1px solid var(--line); border-radius:17px; background:#fff7f1}
+    .client-mini strong{display:block; font-size:14px}
+    .client-mini span{color:var(--muted); font-size:12px}
+    @media (max-width:360px){.hero h2{font-size:28px}.row{grid-template-columns:1fr}.photo-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">MC</div>
+        <div>
+          <h1>Mi Rutina Colagen</h1>
+          <div class="subtitle">Tu seguimiento personalizado</div>
+        </div>
+      </div>
+      <div class="pill" id="topDay">Día 1</div>
+    </header>
+
+    <section id="welcome" class="screen active">
+      <div class="hero">
+        <h2>Tu rutina, acompañada paso a paso.</h2>
+        <p>Un espacio simple para sostener tu constancia, registrar tu progreso y saber cuándo es momento de continuar tu rutina.</p>
+      </div>
+      <div class="card">
+        <h3>Bienvenida ✨</h3>
+        <p>Este seguimiento fue creado para acompañarte de una manera simple, positiva y personalizada según tu objetivo.</p>
+        <p>Vamos a configurar tu rutina, guardar tu punto de partida si corresponde, ayudarte con recordatorios y avisarte cuándo organizar tu reposición.</p>
+        <button onclick="startNewRoutine()">Crear una rutina nueva</button>
+      </div>
+      <div class="card">
+        <h3>¿Ya tenés una rutina?</h3>
+        <p>Entrá a tu seguimiento guardado en este dispositivo.</p>
+        <button class="secondary" onclick="goHome()">Ya tengo una rutina</button>
+      </div>
+    </section>
+
+    <section id="recommendations" class="screen">
+      <div class="card">
+        <h3>Recomendaciones para empezar</h3>
+        <p>Tu seguimiento funciona mejor cuando lo hacés simple y repetible.</p>
+        <div class="list">
+          <div class="rec"><div class="dot">1</div><div><b>Elegí un horario realista.</b><br>Puede ser al levantarte, con el desayuno, a la tarde o cuando mejor encaje en tu día.</div></div>
+          <div class="rec"><div class="dot">2</div><div><b>Marcá tu rutina.</b><br>Cada vez que lo tomes, tocá el botón para registrar tu constancia.</div></div>
+          <div class="rec"><div class="dot">3</div><div><b>Registrá lo importante para tu objetivo.</b><br>Si tu objetivo es visual, te vamos a guiar para guardar fotos comparativas. Si es bienestar o movimiento, vamos a enfocarnos en cómo te vas sintiendo.</div></div>
+          <div class="rec"><div class="dot">4</div><div><b>Continuá sin cortar.</b><br>La app calcula tu reposición según lo que compraste y si lo compartís.</div></div>
+        </div>
+        <button onclick="go('setup')">Configurar mi rutina</button>
+      </div>
+    </section>
+
+
+    <section id="setup" class="screen">
+      <div class="card">
+        <h3>Preguntas iniciales</h3>
+        <p>Con estas respuestas vamos a personalizar tu seguimiento.</p>
+
+        <div class="advisor-badge" id="advisorBadge"></div>
+
+        <div class="field">
+          <label>Tu nombre</label>
+          <input id="name" type="text" placeholder="Ej: Laura" />
+        </div>
+
+        <div class="field">
+          <label>Tu WhatsApp</label>
+          <input id="clientPhone" type="tel" placeholder="Ej: 3446..." />
+          <p class="hint">Este dato queda guardado en este dispositivo por ahora. Más adelante puede servir para una planilla simple de seguimiento.</p>
+        </div>
+
+        <div class="field">
+          <label>¿Qué compraste?</label>
+          <select id="purchase" onchange="toggleCustomUnits()">
+            <option value="1">1 Colagen</option>
+            <option value="3">Kit de 3</option>
+            <option value="6">Kit de 6</option>
+            <option value="custom">Combo personalizado</option>
+          </select>
+        </div>
+
+        <div class="field hide" id="customUnitsWrap">
+          <label>¿Cuántas unidades de Colagen incluye tu combo?</label>
+          <input id="customUnits" type="number" min="1" value="2" />
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Fecha de inicio</label>
+            <input id="startDate" type="date" />
+          </div>
+          <div class="field">
+            <label>¿Cuántas personas lo toman?</label>
+            <select id="people">
+              <option value="1">Solo yo</option>
+              <option value="2">2 personas</option>
+              <option value="3">3 personas</option>
+              <option value="4">4 personas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿Qué te gustaría acompañar con tu rutina?</label>
+          <div class="choice-grid" id="goals">
+            <div class="choice" data-goal="piel">Piel</div>
+            <div class="choice" data-goal="pelo">Pelo</div>
+            <div class="choice" data-goal="uñas">Uñas</div>
+            <div class="choice" data-goal="antiage">Rutina antiage</div>
+            <div class="choice" data-goal="bienestar">Bienestar general</div>
+            <div class="choice" data-goal="movimiento">Articulaciones / movimiento</div>
+            <div class="choice" data-goal="constancia">Constancia</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>¿En qué momento querés tomarlo?</label>
+          <select id="moment" onchange="toggleExactTime()">
+            <option>Al levantarme</option>
+            <option>Con el desayuno</option>
+            <option>A media mañana</option>
+            <option>Después de entrenar</option>
+            <option>A la tarde</option>
+            <option>Antes de dormir</option>
+            <option>Elegir horario exacto</option>
+          </select>
+        </div>
+
+        <div class="field" id="timeWrap">
+          <label>Horario de recordatorio</label>
+          <input id="reminderTime" type="time" value="09:00" />
+        </div>
+
+        <div class="hint" id="advisorHint">Si entraste desde el link de tu asesora, el WhatsApp de reposición ya queda asociado automáticamente.</div>
+
+        <button onclick="saveSetup()">Guardar mi rutina</button>
+      </div>
+    </section>
+
+    <section id="photoStart" class="screen">
+      <div class="card">
+        <h3 id="photoTitle">Guardá tu punto de partida ✨</h3>
+        <p id="photoIntro">Según tu objetivo, una foto inicial puede ayudarte a mirar tu evolución con más claridad.</p>
+        <div class="hint" id="photoHint">Tip: sacala con buena luz, desde el mismo ángulo y sin filtro para comparar mejor más adelante.</div>
+        <div class="photo-card" style="margin-top:12px; min-height:auto">
+          <h4>Foto inicial</h4>
+          <div class="photo-preview" id="preview_initial">Tu foto aparecerá acá</div>
+          <input class="file-input" id="file_initial" type="file" accept="image/*" capture="user" onchange="uploadPhoto('initial')" />
+          <button class="mini-btn secondary" onclick="document.getElementById('file_initial').click()">Tomar o subir foto inicial</button>
+        </div>
+        <button onclick="finishOnboarding()">Continuar a mi rutina</button>
+        <button class="ghost" onclick="finishOnboarding()">Lo hago después</button>
+        <p class="privacy">Tus fotos quedan guardadas solo en este dispositivo en esta versión de prueba. En una versión real, se usaría almacenamiento seguro con consentimiento y opción de eliminación.</p>
+      </div>
+    </section>
+
+    <section id="home" class="screen">
+      <div class="card today-card">
+        <div class="day-badge" id="todayBadge">Día 1 ✨</div>
+        <h2 id="todayTitle">Tu rutina de hoy</h2>
+        <p id="todayCopy">Un día más construyendo constancia.</p>
+        <button onclick="markTaken()">Ya lo tomé ✨</button>
+        <button class="secondary" onclick="snooze()">Recordarme más tarde</button>
+        <button class="ghost" onclick="retakeTomorrow()">Lo retomo mañana</button>
+        <div class="message" id="dailyMessage"></div>
+      </div>
+
+      <div class="card compact-card">
+        <h3>Mi avance</h3>
+        <p id="actionSuggestion">Marcá tu rutina de hoy y seguí construyendo constancia.</p>
+        <div class="mini-progress-line">
+          <span>Días registrados</span>
+          <b id="miniTakenText">0</b>
+        </div>
+        <button class="secondary" onclick="go('progress')">Ver mi progreso</button>
+      </div>
+
+      <div class="card compact-card" id="shareCard">
+        <h3>Avisar a mi asesora</h3>
+        <p>Podés enviarle tus datos básicos para que también pueda acompañarte.</p>
+        <button onclick="sendAdvisorSummary()">Enviar resumen por WhatsApp</button>
+      </div>
+
+      <div class="card" id="checkinCard">
+        <h3>Chequeo de rutina</h3>
+        <p>Queremos saber cómo venís sintiendo tu proceso.</p>
+        <div class="field">
+          <label>¿Cómo venís con tu rutina?</label>
+          <select id="checkConstancy">
+            <option>Muy bien</option>
+            <option>Voy encontrando mi ritmo</option>
+            <option>Quiero ser más constante</option>
+            <option>Quiero que mi asesora me acompañe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>¿Qué estás registrando?</label>
+          <select id="checkFeel">
+            <option>Mi piel</option>
+            <option>Mi pelo</option>
+            <option>Mis uñas</option>
+            <option>Mi bienestar general</option>
+            <option>Mi movimiento</option>
+            <option>Mi constancia</option>
+            <option>Estoy en proceso</option>
+          </select>
+        </div>
+        <button class="secondary" onclick="saveCheckin()">Guardar chequeo</button>
+      </div>
+
+      <details class="card compact-card">
+        <summary>Ajustes y recordatorio</summary>
+        <div class="details-body">
+          <p>Podés cambiar tu horario, lo que compraste o activar un recordatorio web.</p>
+          <button class="secondary" onclick="go('setup')">Realizar modificaciones</button>
+          <button class="secondary" onclick="enableReminder()">Activar recordatorio web</button>
+          <p class="privacy" id="reminderStatus">En esta prueba, el recordatorio funciona mejor mientras la web está abierta o instalada en el celular.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="progress" class="screen">
+      <div class="card">
+        <h3>Mi progreso</h3>
+        <div class="progress-ring" id="progressRing" style="--pct:0">
+          <div class="progress-inner"><div><strong id="pctText">0%</strong><span>constancia</span></div></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong id="dayText">1</strong><span>Día actual</span></div>
+          <div class="stat"><strong id="takenText">0</strong><span>Días registrados</span></div>
+          <div class="stat"><strong id="streakText">0</strong><span>Racha actual</span></div>
+          <div class="stat"><strong id="nextPhotoText">Día 30</strong><span>Próxima foto</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Próximos pasos</h3>
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </section>
+
+    <section id="photos" class="screen">
+      <div class="card">
+        <h3>Mis fotos</h3>
+        <p id="photosCopy">Guardá tus fotos para comparar tu evolución en distintos momentos de tu rutina.</p>
+        <div class="photo-grid">
+          <div class="photo-card">
+            <h4>Inicial</h4>
+            <div class="photo-preview" id="preview_initial_tab">Sin foto todavía</div>
+            <input class="file-input" id="file_initial_tab" type="file" accept="image/*" capture="user" onchange="uploadPhoto('initial','_tab')" />
+            <button class="mini-btn secondary" onclick="document.getElementById('file_initial_tab').click()">Tomar o subir</button>
+          </div>
+          <div class="photo-card">
+            <h4>Día 30</h4>
+            <div class="photo-preview" id="preview_30">Disponible día 30</div>
+            <input class="file-input" id="file_30" type="file" accept="image/*" capture="user" onchange="uploadPhoto('30')" />
+            <button class="mini-btn secondary" onclick="document.getElementById('file_30').click()">Tomar o subir</button>
+          </div>
+          <div class="photo-card">
+            <h4>Día 60</h4>
+            <div class="photo-preview" id="preview_60">Disponible día 60</div>
+            <input class="file-input" id="file_60" type="file" accept="image/*" capture="user" onchange="uploadPhoto('60')" />
+            <button class="mini-btn secondary" onclick="document.getElementById('file_60').click()">Tomar o subir</button>
+          </div>
+          <div class="photo-card">
+            <h4>Día 90</h4>
+            <div class="photo-preview" id="preview_90">Disponible día 90</div>
+            <input class="file-input" id="file_90" type="file" accept="image/*" capture="user" onchange="uploadPhoto('90')" />
+            <button class="mini-btn secondary" onclick="document.getElementById('file_90').click()">Tomar o subir</button>
+          </div>
+        </div>
+        <p class="privacy">En esta versión las fotos son privadas y locales del dispositivo. Para usarlo con clientas reales, lo correcto es sumar login, almacenamiento seguro y consentimiento.</p>
+      </div>
+    </section>
+
+    <section id="reorder" class="screen">
+      <div class="card">
+        <h3>Reposición</h3>
+        <p id="reorderCopy">Vamos a calcular cuándo conviene organizar tu próxima reposición según lo que compraste.</p>
+        <div class="stats">
+          <div class="stat"><strong id="estimatedDays">30</strong><span>Días estimados</span></div>
+          <div class="stat"><strong id="reorderDay">25</strong><span>Aviso sugerido</span></div>
+        </div>
+        <div class="hint" id="reorderHint">Cuando se acerque la fecha, vas a ver el recordatorio para organizarlo con tu asesora.</div>
+        <button onclick="openReorder()">Quiero organizar mi reposición</button>
+        <button class="secondary" onclick="copyReorder()">Copiar mensaje</button>
+        <div class="message" id="copyMessage">Mensaje copiado ✨</div>
+      </div>
+    </section>
+
+
+    <nav class="nav" id="nav">
+      <button onclick="go('home')" data-target="home"><span>🏠</span>Inicio</button>
+      <button onclick="go('progress')" data-target="progress"><span>📈</span>Progreso</button>
+      <button onclick="go('photos')" data-target="photos"><span>✨</span>Fotos</button>
+      <button onclick="go('reorder')" data-target="reorder"><span>🛍️</span>Reponer</button>
+    </nav>
+  </main>
+
+  <script>
+    const KEY = 'miRutinaColagen_v1';
+    const visualGoals = ['piel','pelo','uñas','antiage'];
+    const defaultState = {
+      onboarded:false,
+      name:'',
+      purchase:'1',
+      customUnits:2,
+      people:1,
+      startDate:'',
+      goals:[],
+      moment:'Con el desayuno',
+      reminderTime:'09:00',
+      clientPhone:'',
+      advisorName:'',
+      advisorPhone:'',
+      takenDates:[],
+      softDates:[],
+      checkins:[],
+      photos:{initial:'',30:'',60:'',90:''},
+      advisorSummarySent:false,
+      reminderEnabled:false,
+      lastReminderDate:''
+    };
+    let state = load();
+    function applyAdvisorFromUrl(){
+      const params = new URLSearchParams(window.location.search);
+      const name = (params.get('asesora') || '').trim();
+      const wa = (params.get('wa') || '').replace(/[^0-9]/g,'');
+      if(name || wa){
+        state.advisorName = name || state.advisorName;
+        state.advisorPhone = wa || state.advisorPhone;
+        save();
+      }
+    }
+
+    function load(){
+      try { return {...defaultState, ...(JSON.parse(localStorage.getItem(KEY)) || {})}; }
+      catch(e){ return {...defaultState}; }
+    }
+    function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+    function dateDiffDays(a,b){
+      const d1 = new Date(a + 'T00:00:00');
+      const d2 = new Date(b + 'T00:00:00');
+      return Math.floor((d2-d1)/(1000*60*60*24));
+    }
+    function routineDay(){
+      if(!state.startDate) return 1;
+      return Math.max(1, dateDiffDays(state.startDate, todayISO()) + 1);
+    }
+    function units(){ return state.purchase === 'custom' ? Number(state.customUnits || 1) : Number(state.purchase || 1); }
+    function totalDays(){ return Math.max(1, Math.round(units() * 30 / Number(state.people || 1))); }
+    function reorderAlertDay(){
+      const d = totalDays();
+      if(d <= 35) return Math.max(1, d - 5);
+      if(d <= 100) return Math.max(1, d - 10);
+      return Math.max(1, d - 20);
+    }
+    function isVisualPath(){ return (state.goals || []).some(g => visualGoals.includes(g)); }
+    function go(id){
+      if(id === 'setup') fillSetupFields();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.target === id));
+      render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function goHome(){ go(state.onboarded ? 'home' : 'setup'); }
+    function startNewRoutine(){
+      if(state.onboarded){
+        const ok = confirm('Esto va a crear una rutina nueva y reemplazar el seguimiento guardado en este dispositivo. ¿Querés continuar?');
+        if(!ok) return;
+      }
+      state = {...defaultState, startDate: todayISO()};
+      save();
+      fillSetupFields();
+      go('recommendations');
+    }
+
+    function toggleCustomUnits(){
+      document.getElementById('customUnitsWrap').classList.toggle('hide', document.getElementById('purchase').value !== 'custom');
+    }
+    function toggleExactTime(){
+      const moment = document.getElementById('moment').value;
+      const time = document.getElementById('reminderTime');
+      const presets = {
+        'Al levantarme':'08:00', 'Con el desayuno':'09:00', 'A media mañana':'11:00',
+        'Después de entrenar':'18:00', 'A la tarde':'17:00', 'Antes de dormir':'22:00'
+      };
+      if(presets[moment]) time.value = presets[moment];
+    }
+
+    document.querySelectorAll('#goals .choice').forEach(ch => {
+      ch.addEventListener('click', () => ch.classList.toggle('selected'));
+    });
+
+    function saveSetup(){
+      const selectedGoals = [...document.querySelectorAll('#goals .choice.selected')].map(el => el.dataset.goal);
+      state.name = document.getElementById('name').value.trim();
+      state.clientPhone = document.getElementById('clientPhone').value.replace(/[^0-9]/g,'');
+      state.purchase = document.getElementById('purchase').value;
+      state.customUnits = Number(document.getElementById('customUnits').value || 1);
+      state.startDate = document.getElementById('startDate').value || todayISO();
+      state.people = Number(document.getElementById('people').value || 1);
+      state.goals = selectedGoals.length ? selectedGoals : ['constancia'];
+      state.moment = document.getElementById('moment').value;
+      state.reminderTime = document.getElementById('reminderTime').value || '09:00';
+      save();
+      renderPhotoStart();
+      go('photoStart');
+    }
+
+    function renderPhotoStart(){
+      const visual = isVisualPath();
+      document.getElementById('photoTitle').textContent = visual ? 'Guardá tu punto de partida ✨' : 'Tu seguimiento ya está listo ✨';
+      document.getElementById('photoIntro').textContent = visual
+        ? 'Como tu objetivo es visual, guardar una foto inicial te va a ayudar a comparar tu evolución más adelante.'
+        : 'Según tu objetivo, vamos a acompañar principalmente tu constancia y cómo vas sintiendo tu rutina. La foto es opcional.';
+      document.getElementById('photoHint').textContent = visual
+        ? 'Tip: sacala con buena luz, desde el mismo ángulo y sin filtro para comparar mejor más adelante.'
+        : 'Podés sumar una foto si te gustaría tener un registro inicial, pero no es necesario para este tipo de seguimiento.';
+    }
+
+    function finishOnboarding(){
+      state.onboarded = true;
+      save();
+      go('home');
+    }
+
+    function uploadPhoto(slot, suffix=''){
+      const input = document.getElementById(`file_${slot}${suffix}`);
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        state.photos[slot] = e.target.result;
+        save(); render();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function markTaken(){
+      const t = todayISO();
+      if(!state.takenDates.includes(t)) state.takenDates.push(t);
+      save();
+      const day = routineDay();
+      const msg = milestoneMessage(day) || '¡Bien! Un día más de constancia ✨';
+      showDaily(msg);
+      render();
+    }
+    function snooze(){ showDaily('Listo, te lo recordamos más tarde. Tu rutina se adapta a vos ✨'); }
+    function retakeTomorrow(){
+      const t = todayISO();
+      if(!state.softDates.includes(t)) state.softDates.push(t);
+      save();
+      showDaily('Perfecto, mañana seguimos. La rutina se construye volviendo ✨');
+    }
+    function showDaily(text){
+      const box = document.getElementById('dailyMessage');
+      box.textContent = text;
+      box.classList.add('show');
+    }
+    function milestoneMessage(day){
+      const messages = {
+        3:'¡Primeros 3 días completados! Empezaste a construir tu hábito ✨',
+        7:'¡Una semana sosteniendo tu rutina! Un paso hermoso para vos ✨',
+        10:'¡10 días de rutina! Cada día suma en tu proceso ✨',
+        15:'¡15 días de constancia! Seguí así, paso a paso ✨',
+        21:'¡21 días! Tu hábito empieza a tener más fuerza ✨',
+        30:'¡Primer mes completado! Gran momento para mirar tu progreso ✨',
+        45:'¡45 días acompañando tu rutina! Vas construyendo un proceso real ✨',
+        60:'¡60 días sosteniendo tu proceso! La constancia habla por vos ✨',
+        90:'¡90 días de rutina Colagen! Celebrá este compromiso con vos ✨'
+      };
+      return messages[day];
+    }
+    function streak(){
+      let count = 0;
+      let d = new Date();
+      const set = new Set(state.takenDates);
+      while(true){
+        const iso = d.toISOString().slice(0,10);
+        if(set.has(iso)){ count++; d.setDate(d.getDate()-1); }
+        else break;
+      }
+      return count;
+    }
+    function saveCheckin(){
+      state.checkins.push({date:todayISO(), day:routineDay(), constancy:document.getElementById('checkConstancy').value, feel:document.getElementById('checkFeel').value});
+      save();
+      showDaily('Chequeo guardado. Gracias por registrar cómo venís ✨');
+      render();
+    }
+    function openReorder(){
+      const text = `Hola${state.advisorName ? ' ' + state.advisorName : ''}, quiero organizar mi reposición de Colagen para no cortar mi rutina.`;
+      if(state.advisorPhone){ window.open(`https://wa.me/${state.advisorPhone}?text=${encodeURIComponent(text)}`, '_blank'); }
+      else copyReorder();
+    }
+    function copyReorder(){
+      const text = `Hola${state.advisorName ? ' ' + state.advisorName : ''}, quiero organizar mi reposición de Colagen para no cortar mi rutina.`;
+      navigator.clipboard?.writeText(text);
+      document.getElementById('copyMessage').classList.add('show');
+      setTimeout(()=>document.getElementById('copyMessage').classList.remove('show'), 2200);
+    }
+
+
+    function purchaseLabel(){
+      if(state.purchase === '1') return '1 Colagen';
+      if(state.purchase === '3') return 'Kit de 3';
+      if(state.purchase === '6') return 'Kit de 6';
+      if(state.purchase === 'custom') return `Combo personalizado (${state.customUnits || 1} unidades)`;
+      return state.purchase || 'Colagen';
+    }
+    function advisorSummaryText(){
+      return [
+        `Hola${state.advisorName ? ' ' + state.advisorName : ''} ✨`,
+        `Ya configuré mi rutina Colagen.`,
+        `Nombre: ${state.name || 'No indicado'}`,
+        `WhatsApp: ${state.clientPhone || 'No indicado'}`,
+        `Compré: ${purchaseLabel()}`,
+        `Fecha de inicio: ${state.startDate || todayISO()}`
+      ].join('\n');
+    }
+    function sendAdvisorSummary(){
+      const text = advisorSummaryText();
+      state.advisorSummarySent = true;
+      save();
+      render();
+      if(state.advisorPhone){
+        window.open(`https://wa.me/${state.advisorPhone}?text=${encodeURIComponent(text)}`, '_blank');
+      } else {
+        navigator.clipboard?.writeText(text);
+        showDaily('Datos copiados para enviar a tu asesora ✨');
+      }
+    }
+
+    function enableReminder(){
+      if(!('Notification' in window)){
+        document.getElementById('reminderStatus').textContent = 'Este navegador no permite notificaciones web.';
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if(permission === 'granted'){
+          state.reminderEnabled = true;
+          save();
+          document.getElementById('reminderStatus').textContent = `Recordatorio activado para las ${state.reminderTime || '09:00'} mientras esta versión pueda notificarte.`;
+          new Notification('Mi Rutina Colagen ✨', { body: 'Recordatorio activado. Tu rutina ya está acompañada.' });
+        } else {
+          document.getElementById('reminderStatus').textContent = 'No se activó el permiso de notificaciones. Podés probar nuevamente cuando quieras.';
+        }
+      });
+    }
+    function reminderLoop(){
+      if(!state.reminderEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+      const now = new Date();
+      const hhmm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const today = todayISO();
+      if(hhmm === state.reminderTime && state.lastReminderDate !== today && !state.takenDates.includes(today)){
+        state.lastReminderDate = today;
+        save();
+        new Notification('Mi Rutina Colagen ✨', { body: 'Es momento de tu rutina. Tocá para registrar tu constancia.' });
+      }
+    }
+
+    function renderAdvisorBadge(){
+      const badge = document.getElementById('advisorBadge');
+      const hint = document.getElementById('advisorHint');
+      if(!badge) return;
+      if(state.advisorName || state.advisorPhone){
+        badge.innerHTML = `Estás iniciando tu rutina con <b>${state.advisorName || 'tu asesora'}</b> ✨<br>Cuando quieras reponer, la app va a abrir WhatsApp directo con ella.`;
+        badge.classList.add('show');
+        if(hint) hint.textContent = 'El WhatsApp de tu asesora ya está asociado desde el link que recibiste.';
+      } else {
+        badge.classList.remove('show');
+        if(hint) hint.textContent = 'Si entraste desde el link de tu asesora, el WhatsApp de reposición ya queda asociado automáticamente.';
+      }
+    }
+
+
+    function render(){
+      const d = routineDay();
+      document.getElementById('topDay').textContent = `Día ${d}`;
+      document.getElementById('todayBadge').textContent = `Día ${d} ✨`;
+      document.getElementById('todayTitle').textContent = state.name ? `${state.name}, tu rutina de hoy` : 'Tu rutina de hoy';
+      document.getElementById('todayCopy').textContent = state.reminderTime ? `Tu horario elegido es ${state.reminderTime}. Un día más construyendo constancia.` : 'Un día más construyendo constancia.';
+      const elapsed = d;
+      const taken = state.takenDates.filter(x => state.startDate ? x >= state.startDate : true).length;
+      const pct = Math.min(100, Math.round((taken / Math.max(1, elapsed)) * 100));
+      document.getElementById('progressRing').style.setProperty('--pct', pct);
+      document.getElementById('pctText').textContent = `${pct}%`;
+      document.getElementById('dayText').textContent = d;
+      document.getElementById('takenText').textContent = taken;
+      const miniTaken = document.getElementById('miniTakenText');
+      if(miniTaken) miniTaken.textContent = taken;
+      const shareCard = document.getElementById('shareCard');
+      if(shareCard) shareCard.classList.toggle('hide', !!state.advisorSummarySent || !state.advisorPhone || !state.name);
+      document.getElementById('streakText').textContent = streak();
+      const nextPhoto = d < 30 ? 'Día 30' : d < 60 ? 'Día 60' : d < 90 ? 'Día 90' : 'Lista';
+      document.getElementById('nextPhotoText').textContent = isVisualPath() ? nextPhoto : 'Opcional';
+
+      const checkinDue = [10,15,30,45,60,75,90,120,150].includes(d) && !state.checkins.some(c => c.day === d);
+      document.getElementById('checkinCard').classList.toggle('hide', !checkinDue);
+
+      const suggestion = actionSuggestion(d);
+      document.getElementById('actionSuggestion').textContent = suggestion;
+
+      document.getElementById('estimatedDays').textContent = totalDays();
+      document.getElementById('reorderDay').textContent = `Día ${reorderAlertDay()}`;
+      const remaining = reorderAlertDay() - d;
+      document.getElementById('reorderHint').textContent = remaining > 0
+        ? `Tu aviso de reposición aparecerá aproximadamente en ${remaining} días.`
+        : 'Estás en un buen momento para organizar tu reposición y continuar tu rutina.';
+      document.getElementById('reorderCopy').textContent = `Tu rutina actual está estimada para ${totalDays()} días según lo que cargaste.`;
+
+      const photosCopy = isVisualPath()
+        ? 'Como tu objetivo es visual, estas fotos te ayudan a comparar tu evolución con más claridad.'
+        : 'Las fotos son opcionales para tu objetivo. Podés usarlas si querés tener un registro extra.';
+      document.getElementById('photosCopy').textContent = photosCopy;
+      renderPhotos(); renderTimeline(d);
+    }
+    function actionSuggestion(day){
+      if(!state.onboarded) return 'Configurá tu rutina para recibir una sugerencia personalizada.';
+      if(day >= reorderAlertDay()) return 'Estás en momento de organizar tu reposición para continuar tu rutina.';
+      if(isVisualPath() && [30,60,90].includes(day)) return `Hoy es un buen momento para guardar tu foto del día ${day} y mirar tu progreso.`;
+      if([10,15,30,45,60,75,90].includes(day)) return 'Hoy tenés un chequeo disponible para registrar cómo venís.';
+      if(streak() >= 7) return 'Vas muy bien con tu racha. Celebrá este compromiso con vos ✨';
+      return 'Marcá tu rutina de hoy y seguí construyendo constancia.';
+    }
+    function renderPhotos(){
+      ['initial','30','60','90'].forEach(slot => {
+        const html = state.photos[slot] ? `<img src="${state.photos[slot]}" alt="Foto ${slot}">` : (slot === 'initial' ? 'Sin foto todavía' : `Disponible día ${slot}`);
+        const p = document.getElementById(`preview_${slot}`); if(p) p.innerHTML = html;
+        const pt = document.getElementById(`preview_${slot}_tab`); if(pt) pt.innerHTML = html;
+      });
+    }
+    function renderTimeline(day){
+      const items = [];
+      items.push({n:'✓', title:'Rutina diaria', copy:`Horario elegido: ${state.reminderTime || '09:00'}`});
+      if(isVisualPath()) items.push({n:'30', title:'Próxima foto', copy: day < 30 ? `Faltan ${30-day} días para tu foto día 30.` : 'Ya podés subir tus fotos de progreso.'});
+      items.push({n:'↻', title:'Reposición', copy: day < reorderAlertDay() ? `Aviso sugerido en día ${reorderAlertDay()}.` : 'Momento ideal para organizar continuidad.'});
+      items.push({n:'♡', title:'Chequeos', copy:'Cada 10/15 días registramos cómo venís sintiendo tu rutina.'});
+      document.getElementById('timeline').innerHTML = items.map(i => `<div class="step"><div class="num">${i.n}</div><div><strong>${i.title}</strong><span>${i.copy}</span></div></div>`).join('');
+    }
+
+    function fillSetupFields(){
+      document.getElementById('startDate').value = state.startDate || todayISO();
+      document.getElementById('name').value = state.name || '';
+      document.getElementById('clientPhone').value = state.clientPhone || '';
+      document.getElementById('purchase').value = state.purchase || '1';
+      document.getElementById('customUnits').value = state.customUnits || 2;
+      document.getElementById('people').value = state.people || 1;
+      document.getElementById('moment').value = state.moment || 'Con el desayuno';
+      document.getElementById('reminderTime').value = state.reminderTime || '09:00';
+      renderAdvisorBadge();
+      document.querySelectorAll('#goals .choice').forEach(ch => ch.classList.toggle('selected', (state.goals || []).includes(ch.dataset.goal)));
+      toggleCustomUnits();
+    }
+    function init(){
+      applyAdvisorFromUrl();
+      fillSetupFields();
+      if(state.onboarded) go('home'); else render();
+      setInterval(reminderLoop, 30000);
+    }
+    init();
+  </script>
+</body>
+</html>
